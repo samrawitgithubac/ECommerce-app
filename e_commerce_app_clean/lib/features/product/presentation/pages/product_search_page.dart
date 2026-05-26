@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../injection_container.dart';
 import '../bloc/product_bloc.dart';
-import '../widgets/components/modal_sheet_widget.dart';
 import '../widgets/components/product_card.dart';
-import '../widgets/components/styles/text_style.dart';
 
 class ProductSearchPage extends StatefulWidget {
   const ProductSearchPage({super.key});
@@ -15,125 +13,149 @@ class ProductSearchPage extends StatefulWidget {
 }
 
 class _ProductSearchPageState extends State<ProductSearchPage> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
       body: BlocProvider(
         create: (_) => sl<ProductBloc>()..add(LoadAllProductEvent()),
-        child: Container(
-          padding: const EdgeInsets.all(32),
+        child: SafeArea(
           child: Column(
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon:  Icon(
-                      Icons.arrow_back_ios_rounded,
-                      color: Theme.of(context).primaryColor
-                    ),
-                  ),
-                  const SizedBox(width: 60),
-                  const CustomTextStyle(
-                    name: 'Search Product',
-                    weight: FontWeight.w500,
-                    size: 16,
-                  ),
-                ],
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 20, 0),
                 child: Row(
                   children: [
-                   SizedBox(
-                      width: 270,
-                      height: 48,
-                      child: Stack(
-                        children: [
-                          const TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Leather',
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(217, 217, 217, 1),
-                                    width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(217, 217, 217, 1),
-                                    width: 1.0),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                              left: 230,
-                              child: IconButton(
-                                onPressed: null,
-                                icon: Icon(
-                                  Icons.arrow_forward,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              )),
-                        ],
-                      ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back_ios_rounded, color: Color(0xFF3F51F3), size: 20),
                     ),
-                    const SizedBox(
-                      width: 7,
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Search Products',
+                      style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 18),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const ModalSheetComponent();
-                          },
-                        );
-                      },
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.filter_list_rounded,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 32,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: 'Search by name...',
+                    hintStyle: TextStyle(fontFamily: 'Poppins', color: Colors.grey[400]),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.clear, size: 18),
+                      color: Colors.grey[400],
+                      onPressed: () {
+                        _searchController.clear();
+                      },
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(color: Colors.grey[200]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(color: Colors.grey[200]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Color(0xFF3F51F3), width: 1.5),
+                    ),
+                  ),
+                ),
               ),
-              BlocBuilder<ProductBloc,ProductState>(builder: (context, state) {
-                if (state is ProductLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is LoadedAllProductState) {
-                  return Expanded(
-                      child: ListView.builder(
-                          itemCount: state.products.length,
-                          itemBuilder: (context, index) {
-                            return MyCardBox(product: state.products[index]);
-                          }));
-                } else if (state is ProductErrorState) {
-                  return Center(
-                    child: Text(state.message),
-                  );
-                } else {
-                  return const Center(child: Text('No products'),);
-                }
-              })
+              const SizedBox(height: 8),
+              Expanded(
+                child: BlocBuilder<ProductBloc, ProductState>(
+                  builder: (context, state) {
+                    if (state is ProductLoading) {
+                      return const Center(child: CircularProgressIndicator(color: Color(0xFF3F51F3)));
+                    } else if (state is LoadedAllProductState) {
+                      return _FilteredList(
+                        allProducts: state.products,
+                        searchController: _searchController,
+                      );
+                    } else if (state is ProductErrorState) {
+                      return Center(
+                        child: Text(
+                          state.message,
+                          style: TextStyle(fontFamily: 'Poppins', color: Colors.grey[600]),
+                        ),
+                      );
+                    }
+                    return const Center(
+                      child: Text('Start searching...', style: TextStyle(fontFamily: 'Poppins')),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _FilteredList extends StatefulWidget {
+  final List allProducts;
+  final TextEditingController searchController;
+
+  const _FilteredList({required this.allProducts, required this.searchController});
+
+  @override
+  State<_FilteredList> createState() => _FilteredListState();
+}
+
+class _FilteredListState extends State<_FilteredList> {
+  @override
+  void initState() {
+    super.initState();
+    widget.searchController.addListener(() => setState(() {}));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final query = widget.searchController.text.toLowerCase();
+    final filtered = query.isEmpty
+        ? widget.allProducts
+        : widget.allProducts
+            .where((p) =>
+                p.name.toLowerCase().contains(query) ||
+                p.category.toLowerCase().contains(query))
+            .toList();
+
+    if (filtered.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.search_off_rounded, size: 64, color: Colors.grey[300]),
+            const SizedBox(height: 12),
+            Text(
+              'No products found',
+              style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: Colors.grey[500]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ListView.builder(
+        itemCount: filtered.length,
+        itemBuilder: (context, index) => MyCardBox(product: filtered[index]),
       ),
     );
   }

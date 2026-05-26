@@ -21,64 +21,63 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider<AuthBloc>(
-          create: (context) => sl<AuthBloc>(),
-        ),
-        BlocProvider<ProductBloc>(
-          create: (context) => sl<ProductBloc>(),
-        ),
-
+        BlocProvider<AuthBloc>(create: (context) => sl<AuthBloc>()),
+        BlocProvider<ProductBloc>(create: (context) => sl<ProductBloc>()),
       ],
       child: MaterialApp(
         theme: ThemeData(
-          primaryColor: const Color.fromRGBO(63, 81, 243, 1),
-          secondaryHeaderColor: const Color.fromARGB(230, 255, 19, 19),
-          useMaterial3: false,
+          primaryColor: const Color(0xFF3F51F3),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3F51F3),
+            primary: const Color(0xFF3F51F3),
+            error: const Color(0xFFFF5252),
+          ),
+          scaffoldBackgroundColor: const Color(0xFFF9FAFB),
+          fontFamily: 'Poppins',
+          useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0,
+          ),
         ),
         initialRoute: '/cover_page',
         onGenerateRoute: (settings) {
-          if(settings.name == '/sign_in_page'){
-            return createRoute(SignInPage());
-          }
-          else if(settings.name == '/sign_up_page'){
-            return createRoute(const SignUpPage());
-          }
-          else if(settings.name == '/cover_page'){
-            return createRoute(const CoverPage());
-          }
-          else if (settings.name == '/home_page') {
-            return createRoute(const Home());
+          if (settings.name == '/sign_in_page') {
+            return _createRoute(SignInPage());
+          } else if (settings.name == '/sign_up_page') {
+            return _createRoute(const SignUpPage());
+          } else if (settings.name == '/cover_page') {
+            return _createRoute(const CoverPage());
+          } else if (settings.name == '/home_page') {
+            return _createRoute(const Home());
           } else if (settings.name == '/product_add_page') {
-            return createRoute(const AddProudctPage());
+            return _createRoute(const AddProudctPage());
           } else if (settings.name == '/product_search_page') {
-            return createRoute(const ProductSearchPage());
+            return _createRoute(const ProductSearchPage());
           } else if (settings.name == '/details_page') {
-            return createRoute(DetailsPage(selectedProduct: settings.arguments as ProductEntity));
+            return _createRoute(DetailsPage(selectedProduct: settings.arguments as ProductEntity));
           } else if (settings.name == '/update_page') {
-            return createRoute(UpdatePage(selectedProduct: settings.arguments as ProductEntity));
+            return _createRoute(UpdatePage(selectedProduct: settings.arguments as ProductEntity));
           }
           return null;
         },
-        title: 'Flutter App',
+        title: 'ECOM Shop',
         debugShowCheckedModeBanner: false,
       ),
     ),
   );
 }
-PageRouteBuilder createRoute(Widget page) {
+
+PageRouteBuilder _createRoute(Widget page) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
+      return FadeTransition(
+        opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
         child: child,
       );
     },
+    transitionDuration: const Duration(milliseconds: 300),
   );
 }

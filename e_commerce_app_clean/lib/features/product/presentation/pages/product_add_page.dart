@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +18,7 @@ class AddProudctPage extends StatefulWidget {
 }
 
 class _AddProudctPageState extends State<AddProudctPage> {
-  File? _selectedImage;
+  XFile? _selectedImage;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -31,7 +29,7 @@ class _AddProudctPageState extends State<AddProudctPage> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       if (returnedImage != null) {
-        _selectedImage = File(returnedImage.path);
+        _selectedImage = returnedImage;
       }
     });
   }
@@ -111,7 +109,7 @@ class _AddProudctPageState extends State<AddProudctPage> {
                                   ],
                                 ),
                               )
-                            : Image.file(_selectedImage!),
+                            : Image.network(_selectedImage!.path),
                       ),
                     ),
                     const SizedBox(height: 16),

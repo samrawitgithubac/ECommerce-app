@@ -2,181 +2,167 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../authentication/presentation/bloc/auth_bloc.dart';
-import 'styles/text_style.dart';
 
 class HeaderView extends StatelessWidget {
   const HeaderView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: 50,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Row(
           children: [
-            SizedBox(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF3F51F3), Color(0xFF6C63FF)],
+                ),
+              ),
+              child: const Icon(Icons.person, color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(11),
-                      color: Theme.of(context).primaryColor,
+                  Text(
+                    _getGreeting(),
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CustomTextStyle(
-                        name: 'July 14,2023',
-                        weight: FontWeight.w400,
-                        size: 12,
-                        family: 'Syne',
-                        color: Color.fromRGBO(170, 170, 170, 1),
-                      ),
-                      BlocBuilder<AuthBloc, AuthState>(
-                        builder: (context, state) {
-                          if (state is AuthUserLoaded) {
-                            // final String name = state.userEntity.name;
-                            return Row(
-                              children: [
-                                const CustomTextStyle(
-                                    name: 'Hello, ',
-                                    weight: FontWeight.w400,
-                                    size: 15),
-                                CustomTextStyle(
-                                    name: state.userEntity.name,
-                                    weight: FontWeight.w600,
-                                    size: 15),
-                              ],
-                            );
-                          } else {
-                            return Container();
-                          }
-                        },
-                      )
-                    ],
-                  )
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      if (state is AuthUserLoaded) {
+                        return Text(
+                          state.userEntity.name,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
-            Row(children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color.fromRGBO(221, 221, 221, 1),
-                    width: 1.0,
-                  ),
-                  borderRadius: BorderRadius.circular(9.0),
-                ),
-                child: Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.notifications_none_outlined),
-                      color: const Color.fromRGBO(102, 102, 102, 1),
-                      onPressed: () {},
-                    ),
-                    Positioned(
-                        left: 20,
-                        top: 12,
-                        child: Icon(
-                          Icons.circle,
-                          size: 8,
-                          color: Colors.blue[800],
-                        ))
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10,),
-              SizedBox(
-                width: 42,
-                height: 42,
-                child: Material(
-                  color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: IconButton(
-                    iconSize: 20,
-                    color: Colors.white,
-                    icon: const Icon(Icons.logout),
-                    onPressed: () {
-                      // Handle logout logic here
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Logout'),
-                          content: const Text('Are you sure you want to logout?'),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                context.read<AuthBloc>().add(LogOutEvent());
-                                Navigator.popAndPushNamed(context, '/sign_in_page');
-                              },
-                              child: const Text('Logout'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ]),
-          ],
-        ),
-      ),
-      const SizedBox(height: 38.0),
-      SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const CustomTextStyle(
-                name: 'Available Products', weight: FontWeight.w600, size: 24),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color.fromRGBO(221, 221, 221, 1), // Border color
-                  width: 1.0, // Border width
-                ),
-                borderRadius: BorderRadius.circular(9.0), // Border radius
-              ),
-              child: IconButton(
-                  icon: const Icon(
-                    Icons.search,
-                    size: 24,
-                  ),
-                  color: const Color.fromRGBO(221, 221, 221, 1), // Icon color
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/product_search_page',
-                    );
-                  }),
+            _buildIconButton(
+              icon: Icons.search_rounded,
+              onPressed: () => Navigator.pushNamed(context, '/product_search_page'),
+            ),
+            const SizedBox(width: 8),
+            _buildIconButton(
+              icon: Icons.notifications_none_rounded,
+              badge: true,
+              onPressed: () {},
+            ),
+            const SizedBox(width: 8),
+            _buildIconButton(
+              icon: Icons.logout_rounded,
+              filled: true,
+              onPressed: () => _showLogoutDialog(context),
             ),
           ],
         ),
+        const SizedBox(height: 24),
+        const Row(
+          children: [
+            Text(
+              'Discover Products',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+                fontSize: 22,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  }
+
+  Widget _buildIconButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    bool badge = false,
+    bool filled = false,
+  }) {
+    return Stack(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: filled ? const Color(0xFF3F51F3) : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(icon, size: 20),
+            color: filled ? Colors.white : Colors.grey[700],
+            onPressed: onPressed,
+          ),
+        ),
+        if (badge)
+          Positioned(
+            right: 6,
+            top: 6,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFF5252),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Logout', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
+        content: const Text('Are you sure you want to logout?', style: TextStyle(fontFamily: 'Poppins')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: TextStyle(fontFamily: 'Poppins', color: Colors.grey[600])),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(LogOutEvent());
+              Navigator.popAndPushNamed(ctx, '/sign_in_page');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF5252),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Logout', style: TextStyle(fontFamily: 'Poppins')),
+          ),
+        ],
       ),
-    ]);
+    );
   }
 }

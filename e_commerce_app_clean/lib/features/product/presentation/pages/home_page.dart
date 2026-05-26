@@ -15,57 +15,88 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     context.read<ProductBloc>().add(LoadAllProductEvent());
     context.read<AuthBloc>().add(GetCurrentUserEvent());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      backgroundColor: const Color(0xFFF9FAFB),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Padding(
-              padding: EdgeInsets.fromLTRB(12, 32, 12, 0),
+              padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
               child: HeaderView(),
             ),
-            const SizedBox(height: 22.0),
+            const SizedBox(height: 16),
             Expanded(
               child: BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
-                 if (state is AuthErrorState) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(customSnackBar(state.message,  Theme.of(context).secondaryHeaderColor));
+                  if (state is AuthErrorState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackBar(state.message, const Color(0xFFFF5252)),
+                    );
                   }
                 },
                 child: BlocBuilder<ProductBloc, ProductState>(
                   builder: (context, state) {
                     if (state is ProductLoading) {
                       return const Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(color: Color(0xFF3F51F3)),
                       );
                     }
                     if (state is LoadedAllProductState) {
                       return RefreshIndicator(
+                        color: const Color(0xFF3F51F3),
                         onRefresh: () async {
-                          context
-                              .read<ProductBloc>()
-                              .add(LoadAllProductEvent());
+                          context.read<ProductBloc>().add(LoadAllProductEvent());
                         },
-                        child: ListView.builder(
-                          itemCount: state.products.length,
-                          itemBuilder: (context, index) {
-                            
-                            return MyCardBox(product: state.products[index]);
-                          },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: state.products.length,
+                            itemBuilder: (context, index) {
+                              return MyCardBox(product: state.products[index]);
+                            },
+                          ),
                         ),
                       );
                     } else if (state is ProductErrorState) {
                       return Center(
-                        child: Text(state.message),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+                            const SizedBox(height: 16),
+                            Text(
+                              state.message,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () => context.read<ProductBloc>().add(LoadAllProductEvent()),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF3F51F3),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              child: const Text('Retry', style: TextStyle(fontFamily: 'Poppins')),
+                            ),
+                          ],
+                        ),
                       );
-                    } else {
-                      return Container();
                     }
+                    return const SizedBox.shrink();
                   },
                 ),
               ),
@@ -73,23 +104,12 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: 64,
-        height: 64,
-        child: FloatingActionButton(
-          //-----------------------------------------------------------------
-          onPressed: () {
-            Navigator.pushNamed(context, '/product_add_page');
-          },
-          //-----------------------------------------------------------------
-          backgroundColor: Theme.of(context).primaryColor,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.add,
-            size: 36,
-            color: Colors.white,
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/product_add_page'),
+        backgroundColor: const Color(0xFF3F51F3),
+        elevation: 4,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }

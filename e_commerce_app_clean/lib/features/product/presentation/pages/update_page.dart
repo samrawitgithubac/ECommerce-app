@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,14 +21,14 @@ class UpdatePage extends StatefulWidget {
 }
 
 class _UpdatePageState extends State<UpdatePage> {
-  File? selectedImage;
+  XFile? selectedImage;
 
   Future pickImageFromGallery() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnedImage != null) {
       setState(() {
-        selectedImage = File(returnedImage.path);
+        selectedImage = returnedImage;
       });
     }
   }
@@ -115,7 +113,7 @@ class _UpdatePageState extends State<UpdatePage> {
                               ],
                             ),
                           )
-                        : Image.file(selectedImage!),
+                        : Image.network(selectedImage!.path),
                   ),
                 ),
                 const SizedBox(height: 16),

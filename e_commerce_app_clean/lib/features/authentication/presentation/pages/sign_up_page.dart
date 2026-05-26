@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../product/presentation/widgets/components/styles/custom_button.dart';
 import '../../../product/presentation/widgets/components/styles/snack_bar_style.dart';
-import '../../../product/presentation/widgets/components/styles/text_field_styles.dart';
-import '../../../product/presentation/widgets/components/styles/text_style.dart';
 import '../../domain/entities/sign_up.dart';
 import '../bloc/auth_bloc.dart';
 
@@ -17,222 +14,215 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController usernameController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-
+  final TextEditingController confirmPasswordController = TextEditingController();
   bool isChecked = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthSignedUpState) {
-          ScaffoldMessenger.of(context).showSnackBar(customSnackBar('Sign up successful', Theme.of(context).primaryColor));
-          Navigator.pushNamed(context, '/sign_in_page');
-        } else if (state is AuthErrorState) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(customSnackBar(state.message, Theme.of(context).secondaryHeaderColor));
-        }
-      },
-      builder: (context, state) {
-        if (state is AuthLoadingState) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(32, 0, 36, 0),
+      backgroundColor: Colors.white,
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSignedUpState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              customSnackBar('Account created! Please sign in', const Color(0xFF3F51F3)),
+            );
+            Navigator.pushNamed(context, '/sign_in_page');
+          } else if (state is AuthErrorState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              customSnackBar(state.message, const Color(0xFFFF5252)),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthLoadingState) {
+            return const Center(child: CircularProgressIndicator(color: Color(0xFF3F51F3)));
+          }
+          return SafeArea(
             child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
                 children: [
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back_ios_rounded,
-                            size: 20, color: Theme.of(context).primaryColor),
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: Color(0xFF3F51F3)),
                       ),
-                      CustomTextStyle(
-                        color: Theme.of(context).primaryColor,
-                        name: 'ECOM',
-                        weight: FontWeight.w400,
-                        size: 24,
-                        family: 'CaveatBrush',
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF3F51F3), Color(0xFF6C63FF)],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text(
+                          'ECOM',
+                          style: TextStyle(fontFamily: 'CaveatBrush', fontSize: 24, color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 42),
-                  Container(
-                    margin: const EdgeInsets.only(left: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const CustomTextStyle(
-                            name: 'Create your account',
-                            weight: FontWeight.w600,
-                            size: 27),
-                        const SizedBox(height: 24),
-                        const CustomTextStyle(
-                          name: 'Name',
-                          weight: FontWeight.w400,
-                          size: 16,
-                          color: Color.fromRGBO(111, 111, 111, 1),
-                        ),
-                        const SizedBox(height: 4),
-                        CustomTextField(
-                            hint: 'ex: Jon Smith',
-                            controller: usernameController),
-                        const SizedBox(height: 12),
-                        const CustomTextStyle(
-                          name: 'Email',
-                          weight: FontWeight.w400,
-                          size: 16,
-                          color: Color.fromRGBO(111, 111, 111, 1),
-                        ),
-                        const SizedBox(height: 4),
-                        CustomTextField(
-                            hint: 'ex: Jon Smith@email.com',
-                            controller: emailController),
-                        const SizedBox(height: 12),
-                        const CustomTextStyle(
-                          name: 'Password',
-                          weight: FontWeight.w400,
-                          size: 16,
-                          color: Color.fromRGBO(111, 111, 111, 1),
-                        ),
-                        const SizedBox(height: 4),
-                        CustomTextField(
-                            lines: 1,
-                            obsecure: true,
-                            hint: '...........',
-                            controller: passwordController),
-                        const SizedBox(height: 12),
-                        const CustomTextStyle(
-                          name: 'Confirm Password',
-                          weight: FontWeight.w400,
-                          size: 16,
-                          color: Color.fromRGBO(111, 111, 111, 1),
-                        ),
-                        const SizedBox(height: 4),
-                        CustomTextField(
-                            lines: 1,
-                            obsecure: true,
-                            hint: '...........',
-                            controller: confirmPasswordController),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Checkbox(
-                              //write a code to change the size of the checkbox
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
-                              value: isChecked,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  isChecked = value!;
-                                });
-                              },
-                              activeColor: Theme.of(context).primaryColor,
-                            ),
-                            const CustomTextStyle(
-                              name: 'I understood the ',
-                              weight: FontWeight.w400,
-                              size: 12,
-                              color: Color.fromRGBO(0, 0, 0, 1),
-                            ),
-                            CustomTextStyle(
-                              name: 'Terms & Conditions',
-                              weight: FontWeight.w400,
-                              size: 12,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        CustomButton(
-                          width: MediaQuery.of(context).size.width / 1.25,
-                          height: 42,
-                          name: 'SIGN UP',
-                          fgcolor: Colors.white,
-                          textBgColor: Colors.white,
-                          bgcolor: Theme.of(context).primaryColor,
-                          pressed: () {
-                            if (usernameController.text.isEmpty ||
-                                emailController.text.isEmpty ||
-                                passwordController.text.isEmpty ||
-                                confirmPasswordController.text.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  customSnackBar('All fields are required',
-                                      Theme.of(context).secondaryHeaderColor));
-                            } else if (passwordController.text !=
-                                confirmPasswordController.text) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  customSnackBar('Passwords do not match',
-                                      Theme.of(context).secondaryHeaderColor));
-                            }
-                            else if (isChecked==false){
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  customSnackBar('Did not agreed to terms and conditions',
-                                      Theme.of(context).secondaryHeaderColor));
-                            } else{
-                              context.read<AuthBloc>().add(SignUpEvent(
-                                  signUpEntity: SignUpEntity(
-                                    email: emailController.text,
-                                    password: passwordController.text,
-                                    username: usernameController.text,
-                                  ),
-                                ));
-                            }
-                            
-                          },
-                        ),
-                        const SizedBox(height: 60),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const CustomTextStyle(
-                              color: Color.fromRGBO(111, 111, 111, 1),
-                              name: 'Have an account?',
-                              weight: FontWeight.w400,
-                              size: 16,
-                              family: 'Poppins',
-                            ),
-                            const SizedBox(width: 4),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/sign_in_page');
-                              },
-                              child: CustomTextStyle(
-                                color: Theme.of(context).primaryColor,
-                                name: 'SIGN IN',
-                                weight: FontWeight.w400,
-                                size: 16,
-                                family: 'Poppins',
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
+                  const SizedBox(height: 32),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Create Account',
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.w700),
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Sign up to start shopping',
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey[500]),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  _buildLabel('Full Name'),
+                  const SizedBox(height: 8),
+                  _buildTextField(controller: usernameController, hint: 'John Smith', icon: Icons.person_outline),
+                  const SizedBox(height: 16),
+                  _buildLabel('Email'),
+                  const SizedBox(height: 8),
+                  _buildTextField(controller: emailController, hint: 'your@email.com', icon: Icons.email_outlined),
+                  const SizedBox(height: 16),
+                  _buildLabel('Password'),
+                  const SizedBox(height: 8),
+                  _buildTextField(controller: passwordController, hint: 'Min 6 characters', icon: Icons.lock_outline, obscure: true),
+                  const SizedBox(height: 16),
+                  _buildLabel('Confirm Password'),
+                  const SizedBox(height: 8),
+                  _buildTextField(controller: confirmPasswordController, hint: 'Re-enter password', icon: Icons.lock_outline, obscure: true),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Checkbox(
+                          value: isChecked,
+                          onChanged: (bool? value) => setState(() => isChecked = value!),
+                          activeColor: const Color(0xFF3F51F3),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text('I agree to the ', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, color: Colors.grey[600])),
+                      const Text(
+                        'Terms & Conditions',
+                        style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF3F51F3)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _handleSignUp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3F51F3),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text(
+                        'CREATE ACCOUNT',
+                        style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Already have an account? ', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey[600])),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/sign_in_page'),
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3F51F3)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
           );
-        }
-      },
-    ));
+        },
+      ),
+    );
+  }
+
+  void _handleSignUp() {
+    if (usernameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        customSnackBar('All fields are required', const Color(0xFFFF5252)),
+      );
+    } else if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        customSnackBar('Passwords do not match', const Color(0xFFFF5252)),
+      );
+    } else if (!isChecked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        customSnackBar('Please accept the terms & conditions', const Color(0xFFFF5252)),
+      );
+    } else {
+      context.read<AuthBloc>().add(SignUpEvent(
+            signUpEntity: SignUpEntity(
+              email: emailController.text,
+              password: passwordController.text,
+              username: usernameController.text,
+            ),
+          ));
+    }
+  }
+
+  Widget _buildLabel(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool obscure = false,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: obscure,
+      style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(fontFamily: 'Poppins', color: Colors.grey[400]),
+        prefixIcon: Icon(icon, color: Colors.grey[400], size: 20),
+        filled: true,
+        fillColor: const Color(0xFFF5F6FA),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF3F51F3), width: 1.5),
+        ),
+      ),
+    );
   }
 }

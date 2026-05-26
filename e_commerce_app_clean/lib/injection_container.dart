@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -68,15 +69,19 @@ Future<void> init() async {
   );
 
   //!Core
-  sl.registerLazySingleton<NetworkInfo>(
-      () => NetworkInfoImpl(internetConnectionChecker: sl()));
+  if (kIsWeb) {
+    sl.registerLazySingleton<NetworkInfo>(() => WebNetworkInfo());
+  } else {
+    sl.registerLazySingleton(() => InternetConnectionChecker());
+    sl.registerLazySingleton<NetworkInfo>(
+        () => NetworkInfoImpl(internetConnectionChecker: sl()));
+  }
 
   //external
 
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => InternetConnectionChecker());
 
   //feature: Authentication
   //bloc
