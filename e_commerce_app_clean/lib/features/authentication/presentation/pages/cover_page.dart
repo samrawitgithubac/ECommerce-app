@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/language_toggle.dart';
+
 class CoverPage extends StatefulWidget {
   const CoverPage({super.key});
 
@@ -95,7 +97,9 @@ class _CoverPageState extends State<CoverPage> with SingleTickerProviderStateMix
                     letterSpacing: 2,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
+                const LanguageToggle(),
+                const SizedBox(height: 24),
                 SizedBox(
                   width: 32,
                   height: 32,

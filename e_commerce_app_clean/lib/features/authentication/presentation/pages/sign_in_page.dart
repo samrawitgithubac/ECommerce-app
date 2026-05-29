@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/language_toggle.dart';
 import '../../../product/presentation/widgets/components/styles/snack_bar_style.dart';
 import '../../domain/entities/log_in.dart';
 import '../bloc/auth_bloc.dart';
@@ -15,11 +17,16 @@ class SignInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: const [LanguageToggle(compact: true), SizedBox(width: 8)],
+      ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSignedInState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              customSnackBar('Welcome back!', const Color(0xFF3F51F3)),
+              customSnackBar(context.tr('welcomeBackToast'), const Color(0xFF3F51F3)),
             );
             Navigator.pushNamed(context, '/home_page');
           } else if (state is AuthErrorState) {
@@ -28,7 +35,7 @@ class SignInPage extends StatelessWidget {
             );
           } else if (state is AuthLogOutState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              customSnackBar('Logged out successfully', const Color(0xFF3F51F3)),
+              customSnackBar(context.tr('loggedOut'), const Color(0xFF3F51F3)),
             );
           }
         },
@@ -60,11 +67,11 @@ class SignInPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 48),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Welcome Back',
-                      style: TextStyle(
+                      context.tr('welcomeBack'),
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -75,7 +82,7 @@ class SignInPage extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Sign in to continue shopping',
+                      context.tr('signInContinue'),
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 14,
@@ -84,7 +91,7 @@ class SignInPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 36),
-                  _buildLabel('Email'),
+                  _buildLabel(context.tr('email')),
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: emailController,
@@ -92,7 +99,7 @@ class SignInPage extends StatelessWidget {
                     icon: Icons.email_outlined,
                   ),
                   const SizedBox(height: 20),
-                  _buildLabel('Password'),
+                  _buildLabel(context.tr('password')),
                   const SizedBox(height: 8),
                   _buildTextField(
                     controller: passwordController,
@@ -121,9 +128,9 @@ class SignInPage extends StatelessWidget {
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
-                        'SIGN IN',
-                        style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 16),
+                      child: Text(
+                        context.tr('signIn'),
+                        style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 16),
                       ),
                     ),
                   ),
@@ -132,14 +139,14 @@ class SignInPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        context.tr('noAccount'),
                         style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey[600]),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/sign_up_page'),
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
+                        child: Text(
+                          ' ${context.tr('signUp')}',
+                          style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

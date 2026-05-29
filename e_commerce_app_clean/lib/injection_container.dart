@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/locale/google_translate_service.dart';
+import 'core/locale/locale_cubit.dart';
 import 'core/network/network_info.dart';
 import 'features/authentication/data/data_sources/local/local_data_source.dart';
 import 'features/authentication/data/data_sources/local/local_data_source_impl.dart';
@@ -111,4 +113,9 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl(
         sharedPreferences: sl(),
       ));
+
+  sl.registerLazySingleton<LocaleCubit>(() => LocaleCubit(sl()));
+  sl.registerLazySingleton<GoogleTranslateService>(
+    () => GoogleTranslateService(client: sl(), authLocalDataSource: sl()),
+  );
 }

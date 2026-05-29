@@ -1,16 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../injection_container.dart';
+import '../../../cart/data/cart_api_service.dart';
 import '../../domain/entities/product_entity.dart';
 import '../bloc/product_bloc.dart';
 
-class DetailsPage extends StatelessWidget {
+class DetailsPage extends StatefulWidget {
   final ProductEntity selectedProduct;
 
   const DetailsPage({
     super.key,
     required this.selectedProduct,
   });
+
+  @override
+  State<DetailsPage> createState() => _DetailsPageState();
+}
+
+class _DetailsPageState extends State<DetailsPage> {
+  final _cartApi = CartApiService(client: sl(), authLocalDataSource: sl());
+  bool _addingToCart = false;
+  int _quantity = 1;
+
+  ProductEntity get selectedProduct => widget.selectedProduct;
+
+  Future<void> _addToCart() async {
+    setState(() => _addingToCart = true);
+    try {
+      await _cartApi.addToCart(selectedProduct.id, quantity: _quantity);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Added to cart'),
+          backgroundColor: const Color(0xFF3F51F3),
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'View cart',
+            textColor: Colors.white,
+            onPressed: () => Navigator.pushNamed(context, '/cart_page'),
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to add to cart'),
+          backgroundColor: Color(0xFFFF5252),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _addingToCart = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,6 +215,37 @@ class DetailsPage extends StatelessWidget {
                               height: 1.6,
                             ),
                           ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              const Text(
+                                'Quantity',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                onPressed: _quantity > 1
+                                    ? () => setState(() => _quantity--)
+                                    : null,
+                                icon: const Icon(Icons.remove_circle_outline),
+                              ),
+                              Text(
+                                '$_quantity',
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => setState(() => _quantity++),
+                                icon: const Icon(Icons.add_circle_outline),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -192,31 +266,27 @@ class DetailsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        context.read<ProductBloc>().add(DeleteProductEvent(id: selectedProduct.id));
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFFF5252),
-                        side: const BorderSide(color: Color(0xFFFF5252)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: const Text('DELETE', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 2,
+                  SizedBox(
+                    width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/update_page', arguments: selectedProduct);
-                      },
-                      icon: const Icon(Icons.edit_outlined, size: 18),
-                      label: const Text('UPDATE', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
+                      onPressed: _addingToCart ? null : _addToCart,
+                      icon: _addingToCart
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.shopping_cart_outlined, size: 20),
+                      label: Text(
+                        _addingToCart ? 'Adding...' : 'Add to cart',
+                        style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3F51F3),
                         foregroundColor: Colors.white,
@@ -225,6 +295,33 @@ class DetailsPage extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/update_page', arguments: selectedProduct);
+                          },
+                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          label: const Text('Edit listing'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF3F51F3),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      IconButton(
+                        onPressed: () {
+                          context.read<ProductBloc>().add(DeleteProductEvent(id: selectedProduct.id));
+                        },
+                        icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)),
+                        tooltip: 'Delete listing',
+                      ),
+                    ],
                   ),
                 ],
               ),

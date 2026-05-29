@@ -30,8 +30,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
       // ignore: void_checks
       return const Right(unit);
-    } catch (e) {
-      return const Left(ServerFailure('cannot login'));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Cannot sign in'));
+    } catch (_) {
+      return const Left(ServerFailure(
+        'Cannot reach server. Start the backend (npm start) and check your connection.',
+      ));
     }
   }
 
@@ -54,6 +58,10 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(unit);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message ?? 'Unknown error occurred'));
+    } catch (_) {
+      return const Left(ServerFailure(
+        'Cannot reach server. Start the backend (npm start) and check your connection.',
+      ));
     }
   }
 }

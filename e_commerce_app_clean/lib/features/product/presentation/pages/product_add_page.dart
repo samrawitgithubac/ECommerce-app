@@ -73,7 +73,7 @@ class _AddProudctPageState extends State<AddProudctPage> {
                         ),
                         const SizedBox(width: 80),
                         const CustomTextStyle(
-                            name: 'Add Product',
+                            name: 'Post item for sale',
                             weight: FontWeight.w500,
                             size: 16),
                       ],

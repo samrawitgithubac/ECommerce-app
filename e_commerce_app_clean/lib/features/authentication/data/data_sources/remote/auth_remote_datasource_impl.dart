@@ -17,6 +17,18 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
   AuthRemoteDatasourceImpl(
       {required this.client, required this.authLocalDataSource});
 
+  String? _messageFromBody(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      final message = decoded['message'];
+      if (message is List && message.isNotEmpty) {
+        return message.first.toString();
+      }
+      if (message is String) return message;
+    } catch (_) {}
+    return null;
+  }
+
   @override
   Future<UserModel> getCurrentUser() async {
     final token = await authLocalDataSource.getToken();
@@ -29,22 +41,28 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
       final user = UserModel.fromJson(jsonDecode(response.body)['data']);
       return user;
     } else {
-      throw ServerException();
+      throw ServerException(
+        message: _messageFromBody(response.body) ?? 'Failed to load user',
+      );
     }
   }
 
   @override
   Future<void> logIn(LogInModel logInModel) async {
-    final response = await client.post(Uri.parse(Urls2.login()),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(logInModel));
+    final response = await client.post(
+      Uri.parse(Urls2.login()),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(logInModel.toJson()),
+    );
 
     if (response.statusCode == 201) {
       await authLocalDataSource
           .cacheToken(jsonDecode(response.body)['data']['access_token']);
-    } else {
-      throw ServerException();
+      return;
     }
+    throw ServerException(
+      message: _messageFromBody(response.body) ?? 'Invalid email or password',
+    );
   }
 
   @override
@@ -60,13 +78,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
   Future<void> signUp(SignUpModel signUpModel) async {
     final response = await client.post(
       Uri.parse(Urls2.signUp()),
-      body: jsonEncode(signUpModel),
+      body: jsonEncode(signUpModel.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
-    
-    if (response.statusCode != 201) {
-      final jsonMap = jsonDecode(response.body)['message'][0];
-      throw ServerException(message: jsonMap);
-    }
+
+    if (response.statusCode == 201) return;
+
+    throw ServerException(
+      message: _messageFromBody(response.body) ?? 'Registration failed',
+    );
   }
 }

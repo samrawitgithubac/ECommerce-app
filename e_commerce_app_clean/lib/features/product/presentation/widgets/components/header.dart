@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../core/locale/locale_extensions.dart';
+import '../../../../../core/widgets/language_toggle.dart';
 import '../../../../authentication/presentation/bloc/auth_bloc.dart';
 
 class HeaderView extends StatelessWidget {
@@ -30,7 +32,7 @@ class HeaderView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getGreeting(),
+                    _getGreeting(context),
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 12,
@@ -56,15 +58,16 @@ class HeaderView extends StatelessWidget {
                 ],
               ),
             ),
+            const LanguageToggle(compact: true),
+            const SizedBox(width: 4),
             _buildIconButton(
               icon: Icons.search_rounded,
               onPressed: () => Navigator.pushNamed(context, '/product_search_page'),
             ),
             const SizedBox(width: 8),
             _buildIconButton(
-              icon: Icons.notifications_none_rounded,
-              badge: true,
-              onPressed: () {},
+              icon: Icons.shopping_cart_outlined,
+              onPressed: () => Navigator.pushNamed(context, '/cart_page'),
             ),
             const SizedBox(width: 8),
             _buildIconButton(
@@ -75,11 +78,11 @@ class HeaderView extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const Row(
+        Row(
           children: [
             Text(
-              'Discover Products',
-              style: TextStyle(
+              context.tr('discoverProducts'),
+              style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w700,
                 fontSize: 22,
@@ -91,11 +94,11 @@ class HeaderView extends StatelessWidget {
     );
   }
 
-  String _getGreeting() {
+  String _getGreeting(BuildContext context) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return context.tr('goodMorning');
+    if (hour < 17) return context.tr('goodAfternoon');
+    return context.tr('goodEvening');
   }
 
   Widget _buildIconButton({
@@ -142,12 +145,12 @@ class HeaderView extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Logout', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
-        content: const Text('Are you sure you want to logout?', style: TextStyle(fontFamily: 'Poppins')),
+        title: Text(context.tr('logout'), style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
+        content: Text(context.tr('logoutConfirm'), style: const TextStyle(fontFamily: 'Poppins')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(fontFamily: 'Poppins', color: Colors.grey[600])),
+            child: Text(context.tr('cancel'), style: TextStyle(fontFamily: 'Poppins', color: Colors.grey[600])),
           ),
           ElevatedButton(
             onPressed: () {
@@ -159,7 +162,7 @@ class HeaderView extends StatelessWidget {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Logout', style: TextStyle(fontFamily: 'Poppins')),
+            child: Text(context.tr('logout'), style: const TextStyle(fontFamily: 'Poppins')),
           ),
         ],
       ),
