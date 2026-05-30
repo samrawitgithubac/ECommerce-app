@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/language_toggle.dart';
 import '../../../../injection_container.dart';
 import '../bloc/product_bloc.dart';
 import '../widgets/components/product_card.dart';
@@ -32,11 +34,14 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back_ios_rounded, color: Color(0xFF3F51F3), size: 20),
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Search Products',
-                      style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 18),
+                    Expanded(
+                      child: Text(
+                        context.tr('searchProducts'),
+                        style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 18),
+                      ),
                     ),
+                    const LanguageToggle(compact: true),
+                    const SizedBox(width: 8),
                   ],
                 ),
               ),
@@ -46,7 +51,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                   controller: _searchController,
                   style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
                   decoration: InputDecoration(
-                    hintText: 'Search by name...',
+                    hintText: context.tr('searchByName'),
                     hintStyle: TextStyle(fontFamily: 'Poppins', color: Colors.grey[400]),
                     prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                     suffixIcon: IconButton(
@@ -93,8 +98,8 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                         ),
                       );
                     }
-                    return const Center(
-                      child: Text('Start searching...', style: TextStyle(fontFamily: 'Poppins')),
+                    return Center(
+                      child: Text(context.tr('startSearching'), style: const TextStyle(fontFamily: 'Poppins')),
                     );
                   },
                 ),
@@ -143,7 +148,7 @@ class _FilteredListState extends State<_FilteredList> {
             Icon(Icons.search_off_rounded, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 12),
             Text(
-              'No products found',
+              context.tr('noResults'),
               style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: Colors.grey[500]),
             ),
           ],

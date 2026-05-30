@@ -82,7 +82,19 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDataSource {
       headers: {'Content-Type': 'application/json'},
     );
 
-    if (response.statusCode == 201) return;
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body)['data'];
+      final token = data['access_token'];
+      if (token != null) {
+        await authLocalDataSource.cacheToken(token);
+      } else {
+        await logIn(LogInModel(
+          email: signUpModel.email,
+          password: signUpModel.password,
+        ));
+      }
+      return;
+    }
 
     throw ServerException(
       message: _messageFromBody(response.body) ?? 'Registration failed',

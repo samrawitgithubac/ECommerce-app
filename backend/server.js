@@ -159,7 +159,18 @@ app.post('/api/v2/auth/register', async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({ data: user });
+    const access_token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
+    res.status(201).json({
+      data: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        access_token,
+      },
+    });
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ message: 'Registration failed' });

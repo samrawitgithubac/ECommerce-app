@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/app_bar_language_actions.dart';
 import '../../../../injection_container.dart';
 import '../../data/cart_api_service.dart';
 import 'checkout_page.dart';
@@ -39,7 +41,7 @@ class _CartPageState extends State<CartPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _error = 'Could not load cart. Is the backend running?';
+        _error = context.tr('cartLoadError');
         _loading = false;
       });
     }
@@ -52,7 +54,7 @@ class _CartPageState extends State<CartPage> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to remove item')),
+        SnackBar(content: Text(context.tr('failedRemoveItem'))),
       );
     }
   }
@@ -62,11 +64,12 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text(
-          'My Cart',
-          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+        title: Text(
+          context.tr('myCart'),
+          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
+        actions: appBarLanguageActions(),
       ),
       body: _buildBody(),
       bottomNavigationBar: _cart != null && _cart!.items.isNotEmpty
@@ -90,7 +93,10 @@ class _CartPageState extends State<CartPage> {
             children: [
               Text(_error!, textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _loadCart, child: const Text('Retry')),
+              ElevatedButton(
+                onPressed: _loadCart,
+                child: Text(context.tr('retry')),
+              ),
             ],
           ),
         ),
@@ -103,12 +109,12 @@ class _CartPageState extends State<CartPage> {
           children: [
             Icon(Icons.shopping_cart_outlined, size: 72, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            const Text(
-              'Your cart is empty',
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w600),
+            Text(
+              context.tr('cartEmpty'),
+              style: const TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            Text('Add items to order them', style: TextStyle(color: Colors.grey[600])),
+            Text(context.tr('cartEmptyHint'), style: TextStyle(color: Colors.grey[600])),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -116,7 +122,7 @@ class _CartPageState extends State<CartPage> {
                 backgroundColor: const Color(0xFF3F51F3),
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Browse products'),
+              child: Text(context.tr('browseProducts')),
             ),
           ],
         ),
@@ -165,7 +171,7 @@ class _CartPageState extends State<CartPage> {
                 style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
               ),
               subtitle: Text(
-                'Qty: ${item.quantity} · \$${item.lineTotal.toStringAsFixed(2)}',
+                '${context.tr('qty')}: ${item.quantity} · \$${item.lineTotal.toStringAsFixed(2)}',
                 style: TextStyle(color: Colors.grey[600]),
               ),
               trailing: IconButton(
@@ -200,7 +206,7 @@ class _CartPageState extends State<CartPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Total', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  Text(context.tr('total'), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                   Text(
                     '\$${_cart!.total.toStringAsFixed(2)}',
                     style: const TextStyle(
@@ -232,9 +238,9 @@ class _CartPageState extends State<CartPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
-                'Checkout',
-                style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+              child: Text(
+                context.tr('checkout'),
+                style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
               ),
             ),
           ],

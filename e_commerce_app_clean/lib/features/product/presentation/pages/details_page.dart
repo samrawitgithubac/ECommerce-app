@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/language_toggle.dart';
 import '../../../../injection_container.dart';
 import '../../../cart/data/cart_api_service.dart';
 import '../../domain/entities/product_entity.dart';
@@ -32,11 +34,11 @@ class _DetailsPageState extends State<DetailsPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Added to cart'),
+          content: Text(context.tr('addedToCart')),
           backgroundColor: const Color(0xFF3F51F3),
           behavior: SnackBarBehavior.floating,
           action: SnackBarAction(
-            label: 'View cart',
+            label: context.tr('viewCart'),
             textColor: Colors.white,
             onPressed: () => Navigator.pushNamed(context, '/cart_page'),
           ),
@@ -45,8 +47,8 @@ class _DetailsPageState extends State<DetailsPage> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to add to cart'),
+        SnackBar(
+          content: Text(context.tr('failedAddToCart')),
           backgroundColor: Color(0xFFFF5252),
         ),
       );
@@ -64,7 +66,7 @@ class _DetailsPageState extends State<DetailsPage> {
           if (state is ProductDeletedState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Product deleted successfully'),
+                content: Text(context.tr('productDeleted')),
                 backgroundColor: const Color(0xFF3F51F3),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -121,6 +123,23 @@ class _DetailsPageState extends State<DetailsPage> {
                               onPressed: () => Navigator.pop(context),
                               icon: const Icon(Icons.arrow_back, color: Color(0xFF3F51F3)),
                             ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 16,
+                          top: MediaQuery.of(context).padding.top + 8,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                ),
+                              ],
+                            ),
+                            child: const LanguageToggle(compact: true),
                           ),
                         ),
                       ],
@@ -196,7 +215,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            'Description',
+                            context.tr('description'),
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 16,
@@ -218,8 +237,8 @@ class _DetailsPageState extends State<DetailsPage> {
                           const SizedBox(height: 16),
                           Row(
                             children: [
-                              const Text(
-                                'Quantity',
+                              Text(
+                                context.tr('quantity'),
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w600,
@@ -284,7 +303,7 @@ class _DetailsPageState extends State<DetailsPage> {
                             )
                           : const Icon(Icons.shopping_cart_outlined, size: 20),
                       label: Text(
-                        _addingToCart ? 'Adding...' : 'Add to cart',
+                        _addingToCart ? context.tr('adding') : context.tr('addToCart'),
                         style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -305,7 +324,7 @@ class _DetailsPageState extends State<DetailsPage> {
                             Navigator.pushNamed(context, '/update_page', arguments: selectedProduct);
                           },
                           icon: const Icon(Icons.edit_outlined, size: 18),
-                          label: const Text('Edit listing'),
+                          label: Text(context.tr('editListing')),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF3F51F3),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -319,7 +338,7 @@ class _DetailsPageState extends State<DetailsPage> {
                           context.read<ProductBloc>().add(DeleteProductEvent(id: selectedProduct.id));
                         },
                         icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)),
-                        tooltip: 'Delete listing',
+                        tooltip: context.tr('deleteProduct'),
                       ),
                     ],
                   ),

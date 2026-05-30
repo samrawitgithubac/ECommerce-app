@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/locale/locale_extensions.dart';
 import '../../../../core/widgets/language_toggle.dart';
+import '../../../../core/widgets/password_text_field.dart';
 import '../../../product/presentation/widgets/components/styles/snack_bar_style.dart';
 import '../../domain/entities/log_in.dart';
 import '../bloc/auth_bloc.dart';
@@ -28,7 +29,7 @@ class SignInPage extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               customSnackBar(context.tr('welcomeBackToast'), const Color(0xFF3F51F3)),
             );
-            Navigator.pushNamed(context, '/home_page');
+            Navigator.pushNamedAndRemoveUntil(context, '/home_page', (_) => false);
           } else if (state is AuthErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               customSnackBar(state.message, const Color(0xFFFF5252)),
@@ -101,11 +102,9 @@ class SignInPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildLabel(context.tr('password')),
                   const SizedBox(height: 8),
-                  _buildTextField(
+                  PasswordTextField(
                     controller: passwordController,
                     hint: 'Enter your password',
-                    icon: Icons.lock_outline,
-                    obscure: true,
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
@@ -184,11 +183,9 @@ class SignInPage extends StatelessWidget {
     required TextEditingController controller,
     required String hint,
     required IconData icon,
-    bool obscure = false,
   }) {
     return TextField(
       controller: controller,
-      obscureText: obscure,
       style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/locale/locale_cubit.dart';
-import 'core/locale/locale_extensions.dart';
+import 'core/locale/locale_scope.dart';
 import 'features/authentication/presentation/pages/cover_page.dart';
 import 'features/authentication/presentation/pages/sign_in_page.dart';
 import 'features/authentication/presentation/pages/sign_up_page.dart';
@@ -19,11 +19,18 @@ class EcomApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LocaleCubit, String>(
-      builder: (context, locale) {
-        return MaterialApp(
-          key: ValueKey(locale),
-          title: context.tr('appTitle'),
+    return MaterialApp(
+          title: 'ECOM Shop',
+          builder: (context, child) {
+            return BlocBuilder<LocaleCubit, String>(
+              builder: (context, locale) {
+                return LocaleScope(
+                  languageCode: locale,
+                  child: child ?? const SizedBox.shrink(),
+                );
+              },
+            );
+          },
           theme: ThemeData(
             primaryColor: const Color(0xFF3F51F3),
             colorScheme: ColorScheme.fromSeed(
@@ -40,8 +47,7 @@ class EcomApp extends StatelessWidget {
               elevation: 0,
             ),
           ),
-          // Material widgets use English delegates; app text uses LocaleCubit (en/am).
-          locale: Locale(locale == 'am' ? 'en' : locale),
+          locale: const Locale('en'),
           supportedLocales: const [
             Locale('en'),
             Locale('am'),
@@ -80,8 +86,6 @@ class EcomApp extends StatelessWidget {
           },
           debugShowCheckedModeBanner: false,
         );
-      },
-    );
   }
 }
 

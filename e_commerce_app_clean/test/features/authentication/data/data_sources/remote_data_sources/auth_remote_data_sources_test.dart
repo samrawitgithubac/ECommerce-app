@@ -34,18 +34,21 @@ void main() {
   const tLogInModel = LogInModel(email: 'ley@gmail.com', password: '1234');
   const tUserModel = UserModel(email: 'ley@gmail.com', name: 'ley');
   group('sign up', () {
-    test('should return a void if the response is 201', () async {
+    test('should cache token and return if the response is 201', () async {
       //arrange
+      when(mockAuthLocalDataSource.cacheToken('mytoken'))
+          .thenAnswer((_) async => true);
       when(mockHttpClient.post(Uri.parse(Urls2.signUp()),
-              body: jsonEncode(tSignUpModel),
+              body: jsonEncode(tSignUpModel.toJson()),
               headers: {'Content-Type': 'application/json'}))
           .thenAnswer(
               (_) async => http.Response(readJson(signUpResponsePath), 201));
       //act
       await authRemoteDataSourceImpl.signUp(tSignUpModel);
       //assert
+      verify(mockAuthLocalDataSource.cacheToken('mytoken'));
       verify(mockHttpClient.post(Uri.parse(Urls2.signUp()),
-          body: jsonEncode(tSignUpModel),
+          body: jsonEncode(tSignUpModel.toJson()),
           headers: {'Content-Type': 'application/json'}));
     });
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/language_toggle.dart';
 import '../../domain/entities/product_entity.dart';
 import '../bloc/product_bloc.dart';
 import '../widgets/components/styles/custom_button.dart';
@@ -71,11 +73,14 @@ class _AddProudctPageState extends State<AddProudctPage> {
                             color: Theme.of(context).primaryColor
                           ),
                         ),
-                        const SizedBox(width: 80),
-                        const CustomTextStyle(
-                            name: 'Post item for sale',
+                        Expanded(
+                          child: CustomTextStyle(
+                            name: context.tr('postItemSale'),
                             weight: FontWeight.w500,
-                            size: 16),
+                            size: 16,
+                          ),
+                        ),
+                        const LanguageToggle(compact: true),
                       ],
                     ),
                     const SizedBox(height: 23),

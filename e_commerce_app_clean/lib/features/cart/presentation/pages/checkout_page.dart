@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/app_bar_language_actions.dart';
 import '../../../../injection_container.dart';
 import '../../data/cart_api_service.dart';
 
@@ -78,11 +80,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 28),
-            SizedBox(width: 8),
-            Text('Order placed!', style: TextStyle(fontFamily: 'Poppins')),
+            const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 28),
+            const SizedBox(width: 8),
+            Text(context.tr('orderPlaced'), style: const TextStyle(fontFamily: 'Poppins')),
           ],
         ),
         content: Text(
@@ -101,7 +103,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               backgroundColor: const Color(0xFF3F51F3),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Done'),
+            child: Text(context.tr('done')),
           ),
         ],
       ),
@@ -135,17 +137,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Complete Stripe payment', style: TextStyle(fontFamily: 'Poppins')),
-        content: const Text(
-          '1. Pay on the Stripe page that opened\n'
-          '2. Use test card: 4242 4242 4242 4242\n'
-          '3. Return here and tap Confirm payment',
-          style: TextStyle(fontFamily: 'Poppins', height: 1.5),
+        title: Text(context.tr('completeStripe'), style: const TextStyle(fontFamily: 'Poppins')),
+        content: Text(
+          context.tr('stripeSteps'),
+          style: const TextStyle(fontFamily: 'Poppins', height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(context.tr('cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -171,7 +171,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               backgroundColor: const Color(0xFF3F51F3),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Confirm payment'),
+            child: Text(context.tr('confirmPayment')),
           ),
         ],
       ),
@@ -211,11 +211,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
-  String get _payButtonLabel {
+  String _payButtonLabel(BuildContext context) {
     if (_selectedMethodId == 'card') {
-      return _demoMode && !_stripeEnabled ? 'Pay (demo – test card)' : 'Pay with Stripe';
+      return _demoMode && !_stripeEnabled
+          ? context.tr('payDemo')
+          : context.tr('payStripe');
     }
-    return _demoMode ? 'Place order (demo)' : 'Place order & pay';
+    return _demoMode ? context.tr('placeOrderDemo') : context.tr('placeOrder');
   }
 
   @override
@@ -223,11 +225,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text(
-          'Payment',
-          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+        title: Text(
+          context.tr('payment'),
+          style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
+        actions: appBarLanguageActions(),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF3F51F3)))
@@ -248,9 +251,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Order total',
-                            style: TextStyle(color: Colors.white70, fontFamily: 'Poppins'),
+                          Text(
+                            context.tr('orderTotal'),
+                            style: const TextStyle(color: Colors.white70, fontFamily: 'Poppins'),
                           ),
                           Text(
                             '\$${widget.cartTotal.toStringAsFixed(2)}',
@@ -287,8 +290,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Expanded(
                                 child: Text(
                                   _stripeEnabled
-                                      ? 'Stripe test mode. Card: 4242 4242 4242 4242 (no real money).'
-                                      : 'Demo mode: no real payment. Tap pay to simulate checkout.',
+                                      ? context.tr('stripeTestBanner')
+                                      : context.tr('demoModeBanner'),
                                   style: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
                                 ),
                               ),
@@ -296,11 +299,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                       ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        'Select payment method',
-                        style: TextStyle(
+                        context.tr('selectPayment'),
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -391,7 +394,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ? const Icon(Icons.lock, size: 20)
                       : const Icon(Icons.payment, size: 20),
                   label: Text(
-                    _payButtonLabel,
+                    _payButtonLabel(context),
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,

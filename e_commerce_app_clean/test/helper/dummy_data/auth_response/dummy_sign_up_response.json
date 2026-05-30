@@ -4,6 +4,7 @@
   "data": {
     "id": "66bde36e9bbe07fc39034cdd",
     "name": "ley",
-    "email": "ley@gmail.com"
+    "email": "ley@gmail.com",
+    "access_token": "mytoken"
   }
 }

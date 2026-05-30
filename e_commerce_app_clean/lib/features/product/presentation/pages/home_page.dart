@@ -87,8 +87,8 @@ class _HomeState extends State<Home> {
         body: SafeArea(
           child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                 child: HeaderView(),
               ),
               const SizedBox(height: 16),

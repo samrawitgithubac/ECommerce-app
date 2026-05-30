@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
 import '../../../../core/widgets/language_toggle.dart';
 
 class CoverPage extends StatefulWidget {
@@ -87,9 +88,9 @@ class _CoverPageState extends State<CoverPage> with SingleTickerProviderStateMix
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Your Premium Shop',
-                  style: TextStyle(
+                Text(
+                  context.tr('premiumShop'),
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 18,
                     fontWeight: FontWeight.w400,

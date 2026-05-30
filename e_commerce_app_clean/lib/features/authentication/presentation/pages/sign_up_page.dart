@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/locale/locale_extensions.dart';
+import '../../../../core/widgets/language_toggle.dart';
+import '../../../../core/widgets/password_text_field.dart';
 import '../../../product/presentation/widgets/components/styles/snack_bar_style.dart';
 import '../../domain/entities/sign_up.dart';
 import '../bloc/auth_bloc.dart';
@@ -25,11 +28,11 @@ class _SignUpPageState extends State<SignUpPage> {
       backgroundColor: Colors.white,
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSignedUpState) {
+          if (state is AuthSignedInState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              customSnackBar('Account created! Please sign in', const Color(0xFF3F51F3)),
+              customSnackBar(context.tr('accountCreated'), const Color(0xFF3F51F3)),
             );
-            Navigator.pushNamed(context, '/sign_in_page');
+            Navigator.pushNamedAndRemoveUntil(context, '/home_page', (_) => false);
           } else if (state is AuthErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               customSnackBar(state.message, const Color(0xFFFF5252)),
@@ -66,40 +69,48 @@ class _SignUpPageState extends State<SignUpPage> {
                           style: TextStyle(fontFamily: 'CaveatBrush', fontSize: 24, color: Colors.white),
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      const LanguageToggle(compact: true),
                     ],
                   ),
                   const SizedBox(height: 32),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Create Account',
-                      style: TextStyle(fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.w700),
+                      context.tr('createAccount'),
+                      style: const TextStyle(fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.w700),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Sign up to start shopping',
+                      context.tr('joinUs'),
                       style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey[500]),
                     ),
                   ),
                   const SizedBox(height: 28),
-                  _buildLabel('Full Name'),
+                  _buildLabel(context.tr('fullName')),
                   const SizedBox(height: 8),
                   _buildTextField(controller: usernameController, hint: 'John Smith', icon: Icons.person_outline),
                   const SizedBox(height: 16),
-                  _buildLabel('Email'),
+                  _buildLabel(context.tr('email')),
                   const SizedBox(height: 8),
                   _buildTextField(controller: emailController, hint: 'your@email.com', icon: Icons.email_outlined),
                   const SizedBox(height: 16),
-                  _buildLabel('Password'),
+                  _buildLabel(context.tr('password')),
                   const SizedBox(height: 8),
-                  _buildTextField(controller: passwordController, hint: 'Min 6 characters', icon: Icons.lock_outline, obscure: true),
+                  PasswordTextField(
+                    controller: passwordController,
+                    hint: 'Min 6 characters',
+                  ),
                   const SizedBox(height: 16),
-                  _buildLabel('Confirm Password'),
+                  _buildLabel(context.tr('confirmPassword')),
                   const SizedBox(height: 8),
-                  _buildTextField(controller: confirmPasswordController, hint: 'Re-enter password', icon: Icons.lock_outline, obscure: true),
+                  PasswordTextField(
+                    controller: confirmPasswordController,
+                    hint: 'Re-enter password',
+                  ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -114,10 +125,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text('I agree to the ', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, color: Colors.grey[600])),
-                      const Text(
-                        'Terms & Conditions',
-                        style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF3F51F3)),
+                      Text(context.tr('termsAgree'), style: TextStyle(fontFamily: 'Poppins', fontSize: 13, color: Colors.grey[600])),
+                      Text(
+                        context.tr('termsConditions'),
+                        style: const TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF3F51F3)),
                       ),
                     ],
                   ),
@@ -133,9 +144,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
-                        'CREATE ACCOUNT',
-                        style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 16),
+                      child: Text(
+                        context.tr('createAccountBtn'),
+                        style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 16),
                       ),
                     ),
                   ),
@@ -143,12 +154,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Already have an account? ', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey[600])),
+                      Text(context.tr('haveAccount'), style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey[600])),
                       GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/sign_in_page'),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3F51F3)),
+                        child: Text(
+                          ' ${context.tr('signIn')}',
+                          style: const TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3F51F3)),
                         ),
                       ),
                     ],
@@ -169,15 +180,15 @@ class _SignUpPageState extends State<SignUpPage> {
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        customSnackBar('All fields are required', const Color(0xFFFF5252)),
+        customSnackBar(context.tr('allFieldsRequired'), const Color(0xFFFF5252)),
       );
     } else if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        customSnackBar('Passwords do not match', const Color(0xFFFF5252)),
+        customSnackBar(context.tr('passwordsNoMatch'), const Color(0xFFFF5252)),
       );
     } else if (!isChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        customSnackBar('Please accept the terms & conditions', const Color(0xFFFF5252)),
+        customSnackBar(context.tr('acceptTerms'), const Color(0xFFFF5252)),
       );
     } else {
       context.read<AuthBloc>().add(SignUpEvent(
@@ -204,11 +215,9 @@ class _SignUpPageState extends State<SignUpPage> {
     required TextEditingController controller,
     required String hint,
     required IconData icon,
-    bool obscure = false,
   }) {
     return TextField(
       controller: controller,
-      obscureText: obscure,
       style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,

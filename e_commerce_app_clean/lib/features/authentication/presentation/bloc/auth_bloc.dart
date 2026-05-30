@@ -50,7 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await signUpUsecase(GetParams(signUpEntity: event.signUpEntity));
       result.fold(
         (failure) => emit(AuthErrorState(message: failure.message)),
-        (success) => emit(AuthSignedUpState()),
+        (_) => emit(AuthSignedInState()),
       );
     });
     on<LogOutEvent>((event, emit) async {
